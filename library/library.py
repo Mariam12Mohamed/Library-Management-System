@@ -46,6 +46,15 @@ class Library:
             f"No member found with ID {member_id}."
         )
 
+    def remove_member(self, member_id):
+        member = self.find_member(member_id)
+        if member.borrowed_isbns:
+            raise ValueError(
+                f"Cannot remove {member.name}: they still have "
+                f"{len(member.borrowed_isbns)} book(s) borrowed."
+            )
+        self.members.remove(member)
+
     def search_books(self, keyword):
         keyword = keyword.lower()
         return [
@@ -58,6 +67,20 @@ class Library:
     def list_books(self):
         return sorted(self.books, key=lambda book: book.title)
 
+    def list_borrowed_books(self, member_id):
+        member = self.find_member(member_id)
+        return [
+            book for book in self.books if book.isbn in member.borrowed_isbns
+        ]
+
+    def available_books(self):
+        return [book for book in self.books if not book.is_borrowed]
+
+    def most_borrowed_book(self):
+        if not self.books:
+            return None
+        return max(self.books, key=lambda book: book.borrow_count)
+
     def borrow_book(self, member_id, isbn):
         member = self.find_member(member_id)
         book = self.find_book(isbn)
@@ -68,6 +91,7 @@ class Library:
             )
 
         book.is_borrowed = True
+        book.borrow_count += 1
         member.borrowed_isbns.append(isbn)
 
     def return_book(self, member_id, isbn):

@@ -12,3 +12,9 @@ class BookNotAvailableError(Exception):
 
 class DuplicateEntryError(Exception):
     """Raised when adding a duplicate book or member."""
+
+
+
+
+
+

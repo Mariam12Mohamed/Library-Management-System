@@ -29,32 +29,41 @@ def print_menu():
     )
 
 
+def prompt_required(label):
+    """Keep asking until the user enters a non-empty value."""
+    while True:
+        value = input(f"{label}: ").strip()
+        if value:
+            return value
+        print(f"{label} cannot be empty. Please try again.")
+
+
 def main():
     library = Library()
     load_library(library, DATA_FILE)
 
     while True:
         print_menu()
-        choice = input("Choose an option: ")
+        choice = input("Choose an option: ").strip()
 
         try:
             if choice == "1":
-                title = input("Title: ")
-                author = input("Author: ")
-                isbn = input("ISBN: ")
+                title = prompt_required("Title")
+                author = prompt_required("Author")
+                isbn = prompt_required("ISBN")
                 library.add_book(Book(title, author, isbn))
 
             elif choice == "2":
-                isbn = input("ISBN to remove: ")
+                isbn = prompt_required("ISBN to remove")
                 library.remove_book(isbn)
 
             elif choice == "3":
-                name = input("Member name: ")
-                member_id = input("Member ID: ")
+                name = prompt_required("Member name")
+                member_id = prompt_required("Member ID")
                 library.add_member(Member(name, member_id))
 
             elif choice == "4":
-                keyword = input("Search keyword: ")
+                keyword = prompt_required("Search keyword")
                 results = library.search_books(keyword)
                 for book in results:
                     print("-", book)
@@ -64,13 +73,13 @@ def main():
                     print("-", book)
 
             elif choice == "6":
-                member_id = input("Member ID: ")
-                isbn = input("ISBN: ")
+                member_id = prompt_required("Member ID")
+                isbn = prompt_required("ISBN")
                 library.borrow_book(member_id, isbn)
 
             elif choice == "7":
-                member_id = input("Member ID: ")
-                isbn = input("ISBN: ")
+                member_id = prompt_required("Member ID")
+                isbn = prompt_required("ISBN")
                 library.return_book(member_id, isbn)
 
             elif choice == "8":
@@ -90,8 +99,14 @@ def main():
             MemberNotFoundError,
             BookNotAvailableError,
             DuplicateEntryError,
+            ValueError,
         ) as error:
             print("Error:", error)
+
+        except (EOFError, KeyboardInterrupt):
+            print("\nInput interrupted. Saving and exiting...")
+            save_library(library, DATA_FILE)
+            break
 
 
 if __name__ == "__main__":
